@@ -6,11 +6,11 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-white flex flex-col justify-center px-5 py-16">
 
-      {/* Titre – parfait sur mobile */}
+      {/* Titre */}
       <div className="text-center mb-10">
-        <h1 
+        <h1
           className="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight text-gray-900 leading-none"
-          style={{ 
+          style={{
             fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif",
             letterSpacing: "-0.03em"
           }}
@@ -23,40 +23,47 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Barre de recherche – énorme même sur petit écran */}
+      {/* Barre de recherche + redirection parfaite */}
       <form
-  onSubmit={(e) => {
-    e.preventDefault();
-    const input = e.currentTarget.elements.namedItem("plaque") as HTMLInputElement;
-    const value = input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
-    if (/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(value)) {
-      const formatted = value.replace(/([A-Z]{2})(\d{3})([A-Z]{2})/, "$1-$2-$3");
-      window.location.href = `/p/${formatted}`;
-    }
-  }}
-  className="w-full max-w-4xl"
->
-  <div className="relative">
-    <Input
-      name="plaque"
-      placeholder="AA-123-BB"
-      className="h-32 md:h-36 text-5xl md:text-6xl text-center font-mono tracking-widest placeholder:text-gray-400
-                 border-0 rounded-full shadow-2xl bg-white/95 backdrop-blur-md
-                 focus:ring-4 focus:ring-blue-500/20 focus:outline-none pl-28 pr-80"
-      required
-      autoFocus
-    />
-    <Button
-      type="submit"
-      className="absolute right-5 top-1/2 -translate-y-1/2 h-24 w-24 rounded-full bg-blue-900 hover:bg-blue-800 shadow-2xl"
-    >
-      <Search className="h-12 w-12" />
-    </Button>
-  </div>
-</form>
+        onSubmit={(e) => {
+          e.preventDefault();
+          const input = e.currentTarget.elements.namedItem("plaque") as HTMLInputElement;
+          const value = input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-      {/* 3 étapes – vertical sur mobile, horizontal sur grand écran */}
-      <div className="space-y-8 sm:space-y-0 sm:flex sm:items-center sm:justify-center sm:gap-8 md:gap-16 text-gray-600">
+          if (/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(value)) {
+            const formatted = value.replace(/([A-Z]{2})(\d{3})([A-Z]{2})/, "$1-$2-$3");
+            window.location.href = `/p/${formatted}`;
+          } else {
+            // Optionnel : petit feedback visuel si la plaque est invalide
+            input.setCustomValidity("Format attendu : AA-123-BB");
+            input.reportValidity();
+          }
+        }}
+        className="w-full max-w-4xl mx-auto mb-12"
+      >
+        <div className="relative">
+          <Input
+            name="plaque"
+            placeholder="AA-123-BB"
+            className="h-24 sm:h-28 md:h-32 text-4xl sm:text-5xl md:text-6xl text-center font-mono tracking-widest placeholder:text-gray-400
+                       border-0 rounded-full shadow-2xl bg-white/95 backdrop-blur-md
+                       focus:ring-4 focus:ring-blue-500/20 pl-20 pr-28"
+            required
+            autoFocus
+          />
+
+          <Button
+            type="submit"
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 
+                       rounded-full bg-blue-900 hover:bg-blue-800 shadow-2xl transition"
+          >
+            <Search className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-white" />
+          </Button>
+        </div>
+      </form>
+
+      {/* 3 étapes – responsive */}
+      <div className="flex flex-col sm:flex-row items-center justify-center gap-8 sm:gap-16 md:gap-20 text-gray-600">
         <div className="flex items-center justify-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center flex-shrink-0">
             <Camera className="h-6 w-6 text-gray-700" />
