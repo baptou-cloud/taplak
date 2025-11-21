@@ -1,4 +1,4 @@
-// src/app/p/[plaque]/page.tsx – version finale, sans le 75, magnifique
+// src/app/p/[plaque]/page.tsx – version finale, élégante et lisible
 "use client";
 
 import { useState, useEffect } from "react";
@@ -55,10 +55,13 @@ export default function PlaquePage() {
     if (data) setVehicle(data);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-2xl text-gray-600">Chargement…</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-xl text-gray-600">Chargement…</div>;
   if (!vehicle) return null;
 
   const scoreBg = vehicle.score >= 90 ? "bg-green-600" : vehicle.score >= 70 ? "bg-amber-500" : "bg-red-600";
+  const verdict = vehicle.score === 100 ? "Conducteur exemplaire" :
+                  vehicle.score >= 90 ? "Excellente conduite" :
+                  vehicle.score >= 70 ? "Quelques points d’attention" : "Vigilance recommandée";
 
   return (
     <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20">
@@ -68,78 +71,69 @@ export default function PlaquePage() {
         <ArrowLeft className="w-5 h-5" /> Retour
       </a>
 
-      {/* Plaque – style français, bande bleue haute avec F uniquement */}
-      <div className="mb-16">
-        <div className="bg-white border-4 border-black rounded-lg shadow-2xl overflow-hidden inline-block">
-          <div className="bg-blue-700 px-8 py-4">
-            <span className="block text-white font-bold text-2xl text-center tracking-wider">F</span>
+      {/* Plaque – taille raisonnable, style français */}
+      <div className="mb-10">
+        <div className="bg-white border-4 border-black rounded-lg shadow-xl overflow-hidden inline-block">
+          <div className="bg-blue-700 px-6 py-2">
+            <span className="text-white font-bold text-lg tracking-wider">F</span>
           </div>
-          <div className="bg-white px-12 py-10 text-center">
-            <h1 className="text-7xl md:text-9xl font-black tracking-widest text-black font-mono">
+          <div className="bg-white px-8 py-5 text-center">
+            <h1 className="text-5xl md:text-7xl font-black tracking-widest text-black font-mono">
               {plaque}
             </h1>
           </div>
         </div>
       </div>
 
-      {/* Score – rectangle arrondi */}
-      <div className="mb-12">
-        <div className={`inline-flex items-center justify-center px-16 py-10 rounded-3xl ${scoreBg} shadow-xl`}>
-          <span className="text-8xl md:text-9xl font-black text-white">{vehicle.score}</span>
+      {/* Score + avis communauté */}
+      <div className="text-center mb-12">
+        <p className="text-lg text-gray-600 mb-3">Score</p>
+        <div className={`inline-flex items-center justify-center px-12 py-6 rounded-2xl ${scoreBg} shadow-lg`}>
+          <span className="text-6xl md:text-7xl font-black text-white">{vehicle.score}</span>
         </div>
       </div>
 
-      {/* Verdict */}
-      <p className="text-2xl md:text-3xl font-medium text-gray-800 mb-16 text-center max-w-2xl">
-        {vehicle.score === 100 ? "Conducteur exemplaire" :
-         vehicle.score >= 90 ? "Excellente conduite" :
-         vehicle.score >= 70 ? "Quelques points d’attention" : "Vigilance recommandée"}
-      </p>
+      <div className="text-center mb-16">
+        <p className="text-gray-600 text-lg">Avis de la communauté</p>
+        <p className="text-2xl md:text-3xl font-semibold text-gray-900 mt-2">
+          {verdict}
+        </p>
+      </div>
 
       {/* Badge score 100 */}
       {vehicle.score === 100 && (
-        <div className="bg-green-50 border-2 border-green-300 rounded-2xl px-10 py-6 flex items-center gap-4 mb-16">
-          <CheckCircle2 className="w-12 h-12 text-green-600" />
-          <div>
-            <p className="text-xl font-bold text-green-800">Aucun signalement</p>
-            <p className="text-gray-700">Reconnue comme exemplaire</p>
-          </div>
+        <div className="bg-green-50 border border-green-300 rounded-xl px-8 py-5 flex items-center gap-4 mb-12">
+          <CheckCircle2 className="w-10 h-10 text-green-600" />
+          <p className="text-lg font-medium text-green-800">Aucun signalement enregistré</p>
         </div>
       )}
 
       {/* Votes */}
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-sm">
         {user ? (
-          <div className="grid grid-cols-2 gap-8">
-            <button
-              onClick={() => handleVote("up")}
-              className="p-8 bg-green-50 hover:bg-green-100 rounded-2xl border-2 border-green-200 transition"
-            >
-              <ThumbsUp className="w-16 h-16 mx-auto mb-3 text-green-600" />
-              <span className="block text-4xl font-black text-green-600">{vehicle.votes_up}</span>
-              <span className="text-green-700">Bon conducteur</span>
+          <div className="grid grid-cols-2 gap-6">
+            <button onClick={() => handleVote("up")} className="p-6 bg-green-50 hover:bg-green-100 rounded-xl border border-green-200 transition">
+              <ThumbsUp className="w-12 h-12 mx-auto mb-2 text-green-600" />
+              <span className="block text-3xl font-bold text-green-600">{vehicle.votes_up}</span>
+              <span className="text-sm text-green-700">Bon conducteur</span>
             </button>
-
-            <button
-              onClick={() => handleVote("down")}
-              className="p-8 bg-red-50 hover:bg-red-100 rounded-2xl border-2 border-red-200 transition"
-            >
-              <ThumbsDown className="w-16 h-16 mx-auto mb-3 text-red-600" />
-              <span className="block text-4xl font-black text-red-600">{vehicle.votes_down}</span>
-              <span className="text-red-700">À surveiller</span>
+            <button onClick={() => handleVote("down")} className="p-6 bg-red-50 hover:bg-red-100 rounded-xl border border-red-200 transition">
+              <ThumbsDown className="w-12 h-12 mx-auto mb-2 text-red-600" />
+              <span className="block text-3xl font-bold text-red-600">{vehicle.votes_down}</span>
+              <span className="text-sm text-red-700">À surveiller</span>
             </button>
           </div>
         ) : (
           <div className="text-center">
-            <a href="/login" className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white rounded-full text-xl font-medium hover:bg-gray-800 transition">
-              <LogIn className="w-6 h-6" /> Se connecter pour voter
+            <a href="/login" className="inline-flex items-center gap-3 px-8 py-4 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition">
+              <LogIn className="w-5 h-5" /> Se connecter pour voter
             </a>
           </div>
         )}
       </div>
 
       {/* Mention légale */}
-      <p className="absolute bottom-8 text-center text-gray-500 text-sm flex items-center gap-2">
+      <p className="absolute bottom-8 text-center text-gray-500 text-xs flex items-center gap-1">
         <Shield className="w-4 h-4" />
         Signalements vérifiés manuellement · Aucune donnée personnelle diffusée
       </p>
