@@ -7,7 +7,7 @@ import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn, AlertTriangle, Sh
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PlaquePage() {
-  const router = useRouter();
+  const router = useRouter(); 
   const params = useParams();
   const plaqueRaw = params.plaque as string;
   const plaque = plaqueRaw.toUpperCase().replace(/-/g, "-");
