@@ -1,10 +1,9 @@
-"use client";  // ← CLIENT-SIDE ONLY, ADIEU SSR CRASHES
+"use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn } from "lucide-react";
-import { createBrowserClient } from '@supabase/ssr';
-import { supabase } from "@/lib/supabaseClient";  // Ton client browser
+import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn, AlertTriangle } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function PlaquePage() {
   const router = useRouter();
@@ -23,11 +22,9 @@ export default function PlaquePage() {
       setError(null);
 
       try {
-        // Get user
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
 
-        // Fetch or create vehicle
         let { data: vehicleData } = await supabase
           .from("vehicles")
           .select("*")
@@ -42,7 +39,6 @@ export default function PlaquePage() {
             .single();
           vehicleData = data;
         }
-
         setVehicle(vehicleData);
       } catch (err) {
         setError("Erreur lors du chargement de la plaque");
@@ -51,13 +47,12 @@ export default function PlaquePage() {
         setLoading(false);
       }
     };
-
     fetchVehicle();
   }, [plaqueClean]);
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
-  if (error) return <div className="min-h-screen flex items-center justify-center text-red-600">{error}</div>;
-  if (!vehicle) return <div className="min-h-screen flex items-center justify-center">Plaque non trouvée</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-2xl">Chargement...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-600 text-xl">{error}</div>;
+  if (!vehicle) return <div className="min-h-screen flex items-center justify-center text-xl">Plaque non trouvée</div>;
 
   const scoreColor = vehicle.score >= 80 ? "text-green-600" : vehicle.score >= 60 ? "text-yellow-600" : "text-red-600";
   const borderColor = vehicle.score >= 80 ? "border-green-600" : vehicle.score >= 60 ? "border-yellow-600" : "border-red-600";
@@ -84,10 +79,7 @@ export default function PlaquePage() {
       .update(increment)
       .eq("id", vehicle.id);
 
-    if (!error) {
-      // Refresh the page to update UI
-      router.refresh();
-    }
+    if (!error) router.refresh();
   };
 
   return (
@@ -118,8 +110,8 @@ export default function PlaquePage() {
         )}
 
         <div className="text-center py-8 border-t border-slate-200">
-          <p className="text-lg text-slate-600 mb-6">
-            {user ? "Ton avis compte – merci !" : "Connecte-toi pour voter"}
+          <p className="text-lg text-slate-600 mb-8">
+            {user ? "Ton avis compte – merci !" : "Connecte-toi pour voter ou signaler"}
           </p>
 
           <div className="flex justify-center gap-16">
@@ -142,10 +134,16 @@ export default function PlaquePage() {
                 </button>
               </>
             ) : (
-              <a href="/login" className="flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition">
-                <LogIn className="w-6 h-6" />
-                Se connecter pour voter
-              </a>
+              <div className="flex gap-6">
+                <a href="/login" className="flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition">
+                  <LogIn className="w-6 h-6" />
+                  Se connecter
+                </a>
+                <a href="/login" className="flex items-center gap-3 px-8 py-4 bg-orange-600 text-white rounded-xl font-bold hover:bg-orange-700 transition">
+                  <AlertTriangle className="w-6 h-6" />
+                  Ajouter un signalement
+                </a>
+              </div>
             )}
           </div>
         </div>
