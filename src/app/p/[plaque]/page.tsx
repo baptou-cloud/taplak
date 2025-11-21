@@ -1,4 +1,4 @@
-// src/app/p/[plaque]/page.tsx – version finale, ultra classe, sans erreur
+// src/app/p/[plaque]/page.tsx – version finale, sans le 75, magnifique
 "use client";
 
 import { useState, useEffect } from "react";
@@ -68,19 +68,16 @@ export default function PlaquePage() {
         <ArrowLeft className="w-5 h-5" /> Retour
       </a>
 
-      {/* Plaque encadrée – style vrai plaque française */}
+      {/* Plaque – style français, bande bleue haute avec F uniquement */}
       <div className="mb-16">
         <div className="bg-white border-4 border-black rounded-lg shadow-2xl overflow-hidden inline-block">
-          <div className="bg-blue-700 px-6 py-2 flex items-center justify-center">
-            <span className="text-white font-bold text-sm tracking-wider">F</span>
+          <div className="bg-blue-700 px-8 py-4">
+            <span className="block text-white font-bold text-2xl text-center tracking-wider">F</span>
           </div>
-          <div className="bg-white px-8 py-6">
-            <h1 className="text-6xl md:text-8xl font-black tracking-widest text-black text-center font-mono">
+          <div className="bg-white px-12 py-10 text-center">
+            <h1 className="text-7xl md:text-9xl font-black tracking-widest text-black font-mono">
               {plaque}
             </h1>
-          </div>
-          <div className="bg-blue-700 px-6 py-2 flex items-center justify-center">
-            <span className="text-white font-bold text-sm tracking-wider">75</span>
           </div>
         </div>
       </div>
@@ -99,7 +96,7 @@ export default function PlaquePage() {
          vehicle.score >= 70 ? "Quelques points d’attention" : "Vigilance recommandée"}
       </p>
 
-      {/* Score 100 – badge spécial */}
+      {/* Badge score 100 */}
       {vehicle.score === 100 && (
         <div className="bg-green-50 border-2 border-green-300 rounded-2xl px-10 py-6 flex items-center gap-4 mb-16">
           <CheckCircle2 className="w-12 h-12 text-green-600" />
@@ -141,7 +138,7 @@ export default function PlaquePage() {
         )}
       </div>
 
-      {/* Légale */}
+      {/* Mention légale */}
       <p className="absolute bottom-8 text-center text-gray-500 text-sm flex items-center gap-2">
         <Shield className="w-4 h-4" />
         Signalements vérifiés manuellement · Aucune donnée personnelle diffusée
