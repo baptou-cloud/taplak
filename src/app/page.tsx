@@ -1,71 +1,104 @@
-// src/app/page.tsx
-"use client";
-
-import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+// src/app/page.tsx – à remplacer entièrement
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Shield, Camera, CheckCircle, Search } from "lucide-react";
 
 export default function Home() {
-  const [plaque, setPlaque] = useState("");
-  const router = useRouter();
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!plaque.trim()) return;
-
-    // Normalise la plaque (supprime espaces, met en majuscules, remplace espaces par tirets)
-    const formatted = plaque.trim().toUpperCase().replace(/\s+/g, "-");
-    router.push(`/p/${formatted}`);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="max-w-3xl w-full space-y-16">
-
-        {/* Titre */}
-        <div className="text-center space-y-4">
-          <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter">
-            Taplak
+    <>
+      {/* Héro */}
+      <section className="pt-24 pb-20 px-6 text-center bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            La réputation routière en France
           </h1>
-          <p className="text-xl md:text-2xl text-slate-600">
-            La réputation routière de chaque véhicule en France
+          <p className="text-xl text-gray-700 mb-10 leading-relaxed">
+            Chaque année, plus de 3 400 personnes perdent la vie sur les routes françaises<br />
+            et plus de 70 000 sont gravement blessées.<br />
+            <span className="text-sm text-gray-500">(Source : ONISR – Observatoire national interministériel de la sécurité routière, 2024)</span>
           </p>
+
+          <p className="text-lg text-gray-800 mb-12 max-w-2xl mx-auto">
+            Taplak est une application citoyenne qui permet de signaler anonymement et de manière vérifiée<br />
+            un comportement dangereux sur la route, grâce à la plaque d’immatriculation.
+          </p>
+
+          {/* Champ de recherche géant */}
+          <form action="/p" className="max-w-2xl mx-auto mb-16">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Input
+                name="plaque"
+                placeholder="AA-123-BB"
+                className="text-2xl h-16 text-center sm:text-left border-2 border-gray-300 focus:border-blue-900 rounded-xl"
+                required
+                pattern="[A-Z]{2}-[0-9]{3}-[A-Z]{2}"
+              />
+              <Button size="lg" className="h-16 px-12 text-lg bg-blue-900 hover:bg-blue-800">
+                <Search className="mr-2 h-5 w-5" /> Rechercher
+              </Button>
+            </div>
+          </form>
         </div>
+      </section>
 
-        {/* Barre de recherche fonctionnelle */}
-        <form onSubmit={handleSearch} className="relative">
-          <input
-            type="text"
-            value={plaque}
-            onChange={(e) => setPlaque(e.target.value)}
-            placeholder="Entrez une plaque ⋅ ex : AB-123-CD"
-            className="w-full pl-16 pr-52 py-7 text-xl md:text-2xl rounded-2xl border-2 border-slate-300 focus:border-slate-900 focus:outline-none transition-all shadow-lg focus:shadow-xl placeholder:text-slate-400"
-            autoFocus
-          />
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-9 h-9 text-slate-500" />
+      {/* Comment ça fonctionne – ton très soutenu */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-gray-900">
+            Fonctionnement du service
+          </h2>
 
-          <button
-            type="submit"
-            className="absolute right-3 top-1/2 -translate-y-1/2 bg-slate-900 hover:bg-slate-800 text-white px-10 py-4 rounded-xl text-lg font-semibold transition transform hover:scale-105 active:scale-95"
-          >
-            Rechercher
-          </button>
-        </form>
+          <div className="grid md:grid-cols-3 gap-10">
+            <Card className="p-8 text-center border-0 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-100 flex items-center justify-center">
+                <Camera className="h-8 w-8 text-blue-900" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">1. Signalement avec preuve</h3>
+              <p className="text-gray-700">
+                Vous êtes témoin d’un comportement dangereux ?<br />
+                Prenez une photo ou vidéo claire de la plaque et du contexte.
+              </p>
+            </Card>
 
-        {/* Exemples rapides */}
-        <div className="flex flex-wrap justify-center gap-6">
-          {["AA-111-AA", "BB-222-BB", "CC-333-CC", "DZ-777-ZZ"].map((ex) => (
-            <button
-              key={ex}
-              onClick={() => router.push(`/p/${ex}`)}
-              className="px-8 py-4 bg-white rounded-xl border-2 border-slate-200 text-slate-700 font-medium hover:border-slate-900 hover:shadow-lg hover:scale-105 transition"
-            >
-              {ex}
-            </button>
-          ))}
+            <Card className="p-8 text-center border-0 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-100 flex items-center justify-center">
+                <Shield className="h-8 w-8 text-blue-900" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">2. Vérification humaine</h3>
+              <p className="text-gray-700">
+                Chaque signalement est examiné par notre équipe de modération<br />
+                avant toute publication. Aucune donnée personnelle n’est diffusée.
+              </p>
+            </Card>
+
+            <Card className="p-8 text-center border-0 shadow-lg">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-blue-100 flex items-center justify-center">
+                <CheckCircle className="h-8 w-8 text-blue-900" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">3. Consultation volontaire</h3>
+              <p className="text-gray-700">
+                Le conducteur peut consulter son score à tout moment<br />
+                et prendre connaissance des signalements validés.
+              </p>
+            </Card>
+          </div>
         </div>
+      </section>
 
-      </div>
-    </div>
+      {/* Appel final */}
+      <section className="py-16 bg-gray-50 text-center">
+        <div className="max-w-3xl mx-auto px-6">
+          <p className="text-xl text-gray-800 mb-8">
+            Objectif : encourager une conduite plus responsable<br />
+            par la transparence et la pression sociale positive.
+          </p>
+          <Button asChild size="lg" className="bg-blue-900 hover:bg-blue-800 text-lg px-12">
+            <Link href="/p/nouveau">Effectuer un signalement</Link>
+          </Button>
+        </div>
+      </section>
+    </>
   );
 }
