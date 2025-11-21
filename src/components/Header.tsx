@@ -43,7 +43,7 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 bg-white border-b border-slate-200 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <Link href="/" className="text-4xl font-black text-slate-900 tracking-tighter">
-          Maplak
+          Taplak
         </Link>
 
         <div className="relative">
