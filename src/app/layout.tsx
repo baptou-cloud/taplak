@@ -1,6 +1,5 @@
 import "./globals.css";
-import Header from "@/components/Header";
-import UserMenu from "@/components/UserMenu";  // ← AJOUTÉ
+import UserMenu from "@/components/UserMenu";
 
 export const metadata = {
   title: "Taplak – La réputation routière en France",
@@ -15,10 +14,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="bg-slate-50 min-h-screen">
-        <Header />
-        <main className="pt-20 relative">
+        {/* On vire complètement le Header qui cachait le menu */}
+        <main className="pt-6 relative">
           {children}
-          {/* Menu déroulant utilisateur (visible seulement quand connecté) */}
           <UserMenu />
         </main>
       </body>
