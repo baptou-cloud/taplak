@@ -7,16 +7,15 @@ import { LogIn } from "lucide-react";
 export default function LoginPage() {
   const signInWithGoogle = async () => {
     await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "http://localhost:3000/auth/callback", // URL EXACTE que Supabase attend
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
-      },
-    });
-  };
+  provider: 'google',
+  options: {
+    redirectTo: `${location.origin}/auth/callback`,
+    queryParams: {
+      access_type: 'offline',
+      prompt: 'consent',
+    },
+  },
+})
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex items-center justify-center p-6">
