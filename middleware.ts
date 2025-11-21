@@ -1,14 +1,14 @@
-// middleware.ts – TEST ULTIME
+import { createMiddlewareClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-export function middleware(req: NextRequest) {
-  console.log('URL  →', process.env.NEXT_PUBLIC_SUPABASE_URL)
-  console.log('KEY  →', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? 'OK (longue clé)' : 'MANQUANTE')
-
-  return NextResponse.next()
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient({ req, res })
+  await supabase.auth.getSession()
+  return res
 }
 
 export const config = {
-  matcher: '/p/:path*', // on test juste sur les pages qui crashent
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }
