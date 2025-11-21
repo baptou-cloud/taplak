@@ -13,53 +13,41 @@ export default async function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
-        {/* Logo */}
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-3">
-          <Image src="/globe.svg" alt="Taplak" width={36} height={36} />
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <Image src="/globe.svg" alt="Taplak" width={40} height={40} />
+          <span className="text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Taplak
           </span>
         </Link>
 
-        {/* Navigation */}
-        <nav className className="flex items-center gap-2 sm:gap-4">
+        <nav className="flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/profil" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Mon profil
-            </Link>
+            <Link href="/profil">Mon profil</Link>
           </Button>
 
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/conduite" className="flex items-center gap-2">
-              <Car classNameName="h-4 w-4" />
-              Optimiser ma conduite
-            </Link>
+            <Link href="/conduite">Optimiser ma conduite</Link>
           </Button>
 
           {user ? (
             <>
-              <Button size="sm" className="bg-red-600 hover:bg-red-700" asChild>
-                <Link href="/p/nouveau" className="flex items-center gap-2 text-white">
+              <Button className="bg-red-600 hover:bg-red-700 text-white" size="sm" asChild>
+                <Link href="/p/nouveau" className="flex items-center gap-2">
                   <Siren className="h-4 w-4" />
-                  Faire un signalement
+                  Signalement
                 </Link>
               </Button>
 
               <form action="/auth/signout" method="post">
-                <Button variant="ghost" size="sm" type="submit" className="flex items-center gap-2">
-                  <LogOut className="h-4 w-4" />
+                <Button variant="ghost" size="sm" type="submit">
                   Déconnexion
                 </Button>
               </form>
             </>
           ) : (
-            <Button size="sm" asChild>
-              <Link href="/login" className="flex items-center gap-2">
-                <LogIn className className="h-4 w-4" />
-                Connexion
-              </Link>
+            <Button asChild>
+              <Link href="/login">Connexion</Link>
             </Button>
           )}
         </nav>
