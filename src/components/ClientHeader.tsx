@@ -1,27 +1,30 @@
-// src/components/ClientHeader.tsx
 "use client";
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/lib/supabaseClient"; // ton client existant
-import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabaseClient"; // ton fichier exact
 import Image from "next/image";
-import { LogOut, User, Car, Siren, LogIn } from "lucide-react";
+import { LogOut, User, Car, Siren } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export default function ClientHeader() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    // Charge l'utilisateur actuel
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
+
+    // Écoute les changements de connexion
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
+
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
+  const logout = async () => {
     await supabase.auth.signOut();
-    window.location.reload();
+    window.location.href = "/";
   };
 
   return (
@@ -35,12 +38,8 @@ export default function ClientHeader() {
         </Link>
 
         <nav className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/profil">Mon profil</Link>
-          </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/conduite">Optimiser ma conduite</Link>
-          </Button>
+          <Button variant="ghost" size="sm" asChild><Link href="/profil">Mon profil</Link></Button>
+          <Button variant="ghost" size="sm" asChild><Link href="/conduite">Optimiser ma conduite</Link></Button>
 
           {user ? (
             <>
@@ -50,8 +49,8 @@ export default function ClientHeader() {
                   Faire un signalement
                 </Link>
               </Button>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Déconnexion
+              <Button variant="ghost" size="sm" onClick={logout}>
+                <LogOut className="h-4 w-4 mr-2" /> Déconnexion
               </Button>
             </>
           ) : (
