@@ -1,33 +1,16 @@
-// src/lib/supabase-server.ts – FIX SSR COOKIES NEXT 16 (d'après Supabase docs 2025)
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
-import { cache } from 'react'
+// src/lib/supabase-server.ts
+import { createServerClient } from "@supabase/auth-helpers-nextjs";
+import { cookies } from "next/headers";
 
-export const createClient = cache(async () => {
-  const cookieStore = await cookies()  // ← Await fixe le type Promise
-  return createServerClient(
+export const createServerClient = () =>
+  createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options?: any) {
-          try {
-            cookieStore.set({ name, value, ...options })
-          } catch (error) {
-            // Ignore in server component
-          }
-        },
-        remove(name: string, options?: any) {
-          try {
-            cookieStore.set({ name, value: '', ...options })
-          } catch (error) {
-            // Ignore in server component
-          }
+          return cookies().get(name)?.value;
         },
       },
     }
-  )
-})
+  );
