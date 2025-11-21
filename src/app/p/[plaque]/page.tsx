@@ -1,7 +1,8 @@
-// src/app/p/[plaque]/page.tsx – VERSION 100% NEXT.JS 15 + SUPABASE
+// src/app/p/[plaque]/page.tsx – VERSION FINALE QUI MARCHE SUR VERCEL
 import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn } from "lucide-react";
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 export default async function PlaquePage({
@@ -12,7 +13,7 @@ export default async function PlaquePage({
   const { plaque } = await params;
   const plaqueClean = plaque.toUpperCase().replace(/\s+/g, "-");
 
-   // Client serveur compatible Next.js 15+ (cookies async)
+  // Client Supabase compatible Next.js 15+ (cookies async)
   const supabaseServer = createServerComponentClient({
     cookies: () => cookies(),
   });
@@ -47,9 +48,30 @@ export default async function PlaquePage({
     return "Vigilance recommandée";
   };
 
+  // Action de vote (les deux identiques sauf direction)
+  const voteAction = async (direction: "up" | "down") => {
+    "use server";
+    if (!user) return;
+
+    const increment = direction === "up"
+      ? { votes_up: vehicle!.votes_up + 1, score: Math.min(100, vehicle!.score + 2) }
+      : { votes_down: vehicle!.votes_down + 1, score: Math.max(30, vehicle!.score - 5) };
+
+    const supabase = createServerComponentClient({
+      cookies: () => cookies(),
+    });
+
+    await supabase
+      .from("vehicles")
+      .update(increment)
+      .eq("id", vehicle!.id);
+
+    revalidatePath(`/p/${plaqueClean}`);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-      <div className="max-w-4xl mx-auto p-6 pt-12">
+      <div className="max-w-4xl mx-auto p-6 pt-24">
         <a href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-10 text-lg">
           <ArrowLeft className="w-5 h-5" /> Retour
         </a>
@@ -82,27 +104,7 @@ export default async function PlaquePage({
           <div className="flex justify-center gap-16">
             {user ? (
               <>
-                <form action={async (formData) => {
-                  "use server";
-                  const direction = formData.get("direction") as "up" | "down";
-                  if (!user) return;
-
-                  const increment = direction === "up"
-                    ? { votes_up: vehicle.votes_up + 1, score: Math.min(100, vehicle.score + 2) }
-                    : { votes_down: vehicle.votes_down + 1, score: Math.max(30, vehicle.score - 5) };
-
-                  const cookieStoreVote = await cookies();
-                  const supabaseVote = createServerComponentClient({
-                    cookies: () => cookieStoreVote,
-                  });
-
-                  await supabaseVote
-                    .from("vehicles")
-                    .update(increment)
-                    .eq("id", vehicle.id);
-
-                  redirect(`/p/${plaqueClean}`);  // Recharge la page pour voir le changement
-                }}>
+                <form action={voteAction.bind(null, "up")}>
                   <input type="hidden" name="direction" value="up" />
                   <button className="group flex items-center gap-4 px-10 py-6 bg-green-50 hover:bg-green-100 rounded-3xl border-4 border-green-300 transition transform hover:scale-110">
                     <ThumbsUp className="w-16 h-16 text-green-600 group-hover:scale-125 transition" />
@@ -113,27 +115,7 @@ export default async function PlaquePage({
                   </button>
                 </form>
 
-                <form action={async (formData) => {
-                  "use server";
-                  const direction = formData.get("direction") as "up" | "down";
-                  if (!user) return;
-
-                  const increment = direction === "up"
-                    ? { votes_up: vehicle.votes_up + 1, score: Math.min(100, vehicle.score + 2) }
-                    : { votes_down: vehicle.votes_down + 1, score: Math.max(30, vehicle.score - 5) };
-
-                  const cookieStoreVote = await cookies();
-                  const supabaseVote = createServerComponentClient({
-                    cookies: () => cookieStoreVote,
-                  });
-
-                  await supabaseVote
-                    .from("vehicles")
-                    .update(increment)
-                    .eq("id", vehicle.id);
-
-                  redirect(`/p/${plaqueClean}`);
-                }}>
+                <form action={voteAction.bind(null, "down")}>
                   <input type="hidden" name="direction" value="down" />
                   <button className="group flex items-center gap-4 px-10 py-6 bg-red-50 hover:bg-red-100 rounded-3xl border-4 border-red-300 transition transform hover:scale-110">
                     <ThumbsDown className="w-16 h-16 text-red-600 group-hover:scale-125 transition" />
