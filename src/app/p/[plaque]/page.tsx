@@ -1,6 +1,6 @@
 // src/app/p/[plaque]/page.tsx – VERSION FINALE QUI MARCHE SUR VERCEL EN 2025
 import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn } from "lucide-react";
-import { createServerComponentClient } from "@supabase/ssr"; // ← NOUVEAU PAQUET
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
