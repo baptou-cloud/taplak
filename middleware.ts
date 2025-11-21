@@ -1,3 +1,4 @@
+// middleware.ts – VERSION FINALE 2025 QUI MARCHE
 import { createMiddlewareClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
