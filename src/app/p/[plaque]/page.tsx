@@ -1,9 +1,9 @@
-// src/app/p/[plaque]/page.tsx – version définitive, badge vert au bon endroit + mention légale toujours bien espacée
+// src/app/p/[plaque]/page.tsx – version finale SANS la phrase du bas
 "use client";
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Shield, ThumbsUp, ThumbsDown, LogIn } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ThumbsUp, ThumbsDown, LogIn } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 export default function PlaquePage() {
@@ -100,7 +100,7 @@ export default function PlaquePage() {
         </p>
       </div>
 
-      {/* Badge "Aucun signalement" – exactement comme tu l’aimais */}
+      {/* Badge "Aucun signalement" */}
       {vehicle.score === 100 && (
         <div className="mb-20">
           <div className="bg-green-50 border border-green-300 rounded-xl px-8 py-5 flex items-center gap-4">
@@ -111,7 +111,7 @@ export default function PlaquePage() {
       )}
 
       {/* Votes */}
-      <div className="w-full max-w-sm mb-32">
+      <div className="w-full max-w-sm">
         {user ? (
           <div className="grid grid-cols-2 gap-6">
             <button onClick={() => handleVote("up")} className="p-6 bg-green-50 hover:bg-green-100 rounded-xl border border-green-200 transition">
@@ -134,11 +134,6 @@ export default function PlaquePage() {
         )}
       </div>
 
-      {/* Mention légale – toujours bien en bas, jamais collée */}
-      <p className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-gray-500 text-xs flex items-center gap-1 max-w-md">
-        <Shield className="w-4 h-4" />
-        Signalements vérifiés manuellement · Aucune donnée personnelle diffusée
-      </p>
     </main>
   );
 }
