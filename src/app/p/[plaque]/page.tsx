@@ -1,4 +1,4 @@
-// src/app/p/[plaque]/page.tsx – version finale, élégante et lisible
+// src/app/p/[plaque]/page.tsx – version finale avec bon espacement
 "use client";
 
 import { useState, useEffect } from "react";
@@ -66,12 +66,11 @@ export default function PlaquePage() {
   return (
     <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20">
 
-      {/* Retour */}
       <a href="/" className="absolute top-20 left-6 flex items-center gap-2 text-gray-600 hover:text-black text-lg">
         <ArrowLeft className="w-5 h-5" /> Retour
       </a>
 
-      {/* Plaque – taille raisonnable, style français */}
+      {/* Plaque */}
       <div className="mb-10">
         <div className="bg-white border-4 border-black rounded-lg shadow-xl overflow-hidden inline-block">
           <div className="bg-blue-700 px-6 py-2">
@@ -85,7 +84,7 @@ export default function PlaquePage() {
         </div>
       </div>
 
-      {/* Score + avis communauté */}
+      {/* Score */}
       <div className="text-center mb-12">
         <p className="text-lg text-gray-600 mb-3">Score</p>
         <div className={`inline-flex items-center justify-center px-12 py-6 rounded-2xl ${scoreBg} shadow-lg`}>
@@ -93,18 +92,21 @@ export default function PlaquePage() {
         </div>
       </div>
 
-      <div className="text-center mb-16">
+      {/* Avis communauté */}
+      <div className="text-center mb-8">
         <p className="text-gray-600 text-lg">Avis de la communauté</p>
         <p className="text-2xl md:text-3xl font-semibold text-gray-900 mt-2">
           {verdict}
         </p>
       </div>
 
-      {/* Badge score 100 */}
+      {/* Badge "Aucun signalement" – espacement confortable */}
       {vehicle.score === 100 && (
-        <div className="bg-green-50 border border-green-300 rounded-xl px-8 py-5 flex items-center gap-4 mb-12">
-          <CheckCircle2 className="w-10 h-10 text-green-600" />
-          <p className="text-lg font-medium text-green-800">Aucun signalement enregistré</p>
+        <div className="mb-20"> {/* ← c’est cette marge qui fait respirer */}
+          <div className="bg-green-50 border border-green-300 rounded-xl px-8 py-5 flex items-center gap-4">
+            <CheckCircle2 className="w-10 h-10 text-green-600" />
+            <p className="text-lg font-medium text-green-800">Aucun signalement enregistré</p>
+          </div>
         </div>
       )}
 
@@ -132,8 +134,8 @@ export default function PlaquePage() {
         )}
       </div>
 
-      {/* Mention légale */}
-      <p className="absolute bottom-8 text-center text-gray-500 text-xs flex items-center gap-1">
+      {/* Mention légale – toujours bien espacée */}
+      <p className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-gray-500 text-xs flex items-center gap-1 max-w-md">
         <Shield className="w-4 h-4" />
         Signalements vérifiés manuellement · Aucune donnée personnelle diffusée
       </p>
