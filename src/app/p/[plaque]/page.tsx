@@ -1,6 +1,6 @@
-// src/app/p/[plaque]/page.tsx – VERSION FINALE QUI MARCHE SUR VERCEL EN 2025
+// src/app/p/[plaque]/page.tsx – FIX FINAL COOKIES NEXT 16
 import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn } from "lucide-react";
-import { createServerClient } from "@supabase/ssr"; // ← BON MAINTENANT
+import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -13,12 +13,23 @@ export default async function PlaquePage({
   const { plaque } = await params;
   const plaqueClean = plaque.toUpperCase().replace(/\s+/g, "-");
 
-  // Client Supabase server-side (Next.js 16+ compatible)
+  // Client Supabase server-side (fix types cookies pour Next 16)
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: () => cookies(),
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name: string, value: string, options?: any) {
+          cookieStore.set(name, value, options);
+        },
+        remove(name: string, options?: any) {
+          cookieStore.set(name, '', options);
+        },
+      },
     }
   );
 
@@ -63,21 +74,33 @@ export default async function PlaquePage({
     return "Vigilance recommandée";
   };
 
-  // Server Action pour voter
-  const voteAction = async (direction: "up" | "down") => {
+  // Server Action pour voter (même fix cookies)
+  async function voteAction(formData: FormData) {
     "use server";
-    if (!user) return;
+    const direction = formData.get("direction") as "up" | "down";
+    if (!user || !direction) return;
 
     const increment =
       direction === "up"
         ? { votes_up: vehicle!.votes_up + 1, score: Math.min(100, vehicle!.score + 2) }
         : { votes_down: vehicle!.votes_down + 1, score: Math.max(30, vehicle!.score - 5) };
 
+    const cookieStoreVote = await cookies();
     const supabaseVote = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
-        cookies: () => cookies(),
+        cookies: {
+          get(name: string) {
+            return cookieStoreVote.get(name)?.value;
+          },
+          set(name: string, value: string, options?: any) {
+            cookieStoreVote.set(name, value, options);
+          },
+          remove(name: string, options?: any) {
+            cookieStoreVote.set(name, '', options);
+          },
+        },
       }
     );
 
@@ -87,7 +110,7 @@ export default async function PlaquePage({
       .eq("id", vehicle!.id);
 
     revalidatePath(`/p/${plaqueClean}`);
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
@@ -137,8 +160,9 @@ export default async function PlaquePage({
           <div className="flex justify-center gap-16">
             {user ? (
               <>
-                <form action={voteAction.bind(null, "up")}>
-                  <button className="group flex items-center gap-4 px-10 py-6 bg-green-50 hover:bg-green-100 rounded-3xl border-4 border-green-300 transition transform hover:scale-110">
+                <form action={voteAction}>
+                  <input type="hidden" name="direction" value="up" />
+                  <button type="submit" className="group flex items-center gap-4 px-10 py-6 bg-green-50 hover:bg-green-100 rounded-3xl border-4 border-green-300 transition transform hover:scale-110">
                     <ThumbsUp className="w-16 h-16 text-green-600 group-hover:scale-125 transition" />
                     <div className="text-left">
                       <div className="text-4xl font-black text-green-600">
@@ -149,8 +173,9 @@ export default async function PlaquePage({
                   </button>
                 </form>
 
-                <form action={voteAction.bind(null, "down")}>
-                  <button className="group flex items-center gap-4 px-10 py-6 bg-red-50 hover:bg-red-100 rounded-3xl border-4 border-red-300 transition transform hover:scale-110">
+                <form action={voteAction}>
+                  <input type="hidden" name="direction" value="down" />
+                  <button type="submit" className="group flex items-center gap-4 px-10 py-6 bg-red-50 hover:bg-red-100 rounded-3xl border-4 border-red-300 transition transform hover:scale-110">
                     <ThumbsDown className="w-16 h-16 text-red-600 group-hover:scale-125 transition" />
                     <div className="text-left">
                       <div className="text-4xl font-black text-red-600">
