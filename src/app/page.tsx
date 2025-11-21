@@ -1,48 +1,77 @@
-// src/app/page.tsx  ← remplace tout le fichier par ça
+// src/app/page.tsx – version finale Apple ultra large
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
-import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Search, Camera, Shield, Eye } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6">
-      {/* Titre + sous-titre ultra épurés */}
-      <div className="text-center mb-16">
-        <h1 className="text-6xl md:text-8xl font-black跟踪 tracking-tight text-gray-900">
+    <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-24">
+      
+      {/* TAPLAK en style Apple SF Pro Display Black – ultra large et massif */}
+      <div className="text-center mb-20">
+        <h1 
+          className="text-8xl md:text-9xl lg:text-[180px] leading-none font-black tracking-tight text-gray-900"
+          style={{ 
+            fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+            letterSpacing: "-0.04em"
+          }}
+        >
           Taplak
         </h1>
-        <p className="mt-6 text-xl md:text-2xl text-gray-600 font-light max-w-2xl">
-          Application citoyenne de signalement anonyme et vérifié<br />
+
+        <p className="mt-10 text-xl md:text-2xl text-gray-600 font-light max-w-3xl leading-relaxed">
+          Application citoyenne de signalement anonyme et vérifié<br className="hidden md:block" />
           des comportements dangereux sur la route
         </p>
       </div>
 
-      {/* Barre de recherche – LA star, énorme, magnifique */}
-      <form action="/p" className="w-full max-w-3xl">
-        <Input
-          name="plaque"
-          placeholder="AA-123-BB"
-          className="h-24 md:h-28 text-4xl md:text-5xl text-center font-mono tracking-widest placeholder:text-gray-400
-                     border-0 shadow-2xl rounded-3xl bg-white/90 backdrop-blur-sm
-                     focus:ring-4 focus:ring-blue-500/20 focus:outline-none transition-all"
-          autoFocus
-          required
-          pattern="[A-Z]{2}-[0-9]{3}-[A-Z]{2}"
-        />
+      {/* Barre de recherche Apple-style – énorme, ronde, bouton intégré */}
+      <form action="/p" className="w-full max-w-4xl">
+        <div className="relative">
+          <Input
+            name="plaque"
+            placeholder="AA-123-BB"
+            className="h-32 md:h-36 text-5xl md:text-6xl text-center font-mono tracking-widest placeholder:text-gray-400
+                       border-0 rounded-full shadow-2xl bg-white/95 backdrop-blur-md
+                       focus:ring-4 focus:ring-blue-500/20 focus:outline-none pl-28 pr-80 transition-all"
+            autoFocus
+            required
+            pattern="[A-Z]{2}-[0-9]{3}-[A-Z]{2}"
+          />
+          <Button 
+            className="absolute right-5 top-1/2 -translate-y-1/2 h-24 w-24 rounded-full bg-blue-900 hover:bg-blue-800 shadow-2xl"
+          >
+            <Search className="h-12 w-12" />
+          </Button>
+        </div>
       </form>
 
-      {/* 3 étapes – ultra discrètes, juste pour habiller */}
-      <div className="mt-24 flex flex-col md:flex-row gap-12 text-center text-gray-500 text-sm">
-        <div>1. Prise de preuve claire</div>
-        <div className="hidden md:block">·</div>
-        <div>2. Vérification humaine</div>
-        <div className="hidden md:block">·</div>
-        <div>3. Consultation volontaire du score</div>
-      </div>
+      {/* 3 étapes ultra minimalistes – style Apple */}
+      <div className="mt-32 flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 text-gray-500">
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
+            <Camera className="h-7 w-7 text-gray-700" />
+          </div>
+          <span className="text-lg font-medium">Preuve claire</span>
+        </div>
 
-      {/* Optionnel : petit logo voiture en bas à droite – très discret */}
-      <div className="absolute bottom-8 right-8 opacity-20">
-        <Image src="/car-logo.svg" alt="" width={80} height={80} />
+        <div className="hidden md:block w-24 h-px bg-gray-300"></div>
+
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
+            <Shield className="h-7 w-7 text-gray-700" />
+          </div>
+          <span className="text-lg font-medium">Vérification humaine</span>
+        </div>
+
+        <div className="hidden md:block w-24 h-px bg-gray-300"></div>
+
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
+            <Eye className="h-7 w-7 text-gray-700" />
+          </div>
+          <span className="text-lg font-medium">Consultation volontaire</span>
+        </div>
       </div>
     </main>
   );
