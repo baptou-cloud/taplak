@@ -1,6 +1,6 @@
 // src/app/p/[plaque]/page.tsx – VERSION FINALE QUI MARCHE SUR VERCEL EN 2025
 import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn } from "lucide-react";
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr"; // ← BON MAINTENANT
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -13,10 +13,14 @@ export default async function PlaquePage({
   const { plaque } = await params;
   const plaqueClean = plaque.toUpperCase().replace(/\s+/g, "-");
 
-  // Client Supabase compatible Next.js 16+
-  const supabase = createServerComponentClient({
-    cookies: () => cookies(),
-  });
+  // Client Supabase server-side (Next.js 16+ compatible)
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: () => cookies(),
+    }
+  );
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -59,7 +63,7 @@ export default async function PlaquePage({
     return "Vigilance recommandée";
   };
 
-  // Action de vote (server action)
+  // Server Action pour voter
   const voteAction = async (direction: "up" | "down") => {
     "use server";
     if (!user) return;
@@ -69,9 +73,13 @@ export default async function PlaquePage({
         ? { votes_up: vehicle!.votes_up + 1, score: Math.min(100, vehicle!.score + 2) }
         : { votes_down: vehicle!.votes_down + 1, score: Math.max(30, vehicle!.score - 5) };
 
-    const supabaseVote = createServerComponentClient({
-      cookies: () => cookies(),
-    });
+    const supabaseVote = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: () => cookies(),
+      }
+    );
 
     await supabaseVote
       .from("vehicles")
