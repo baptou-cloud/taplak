@@ -24,23 +24,36 @@ export default function Home() {
       </div>
 
       {/* Barre de recherche – énorme même sur petit écran */}
-      <form action="/p" className="w-full max-w-2xl mx-auto mb-12">
-        <div className="relative">
-          <Input
-            name="plaque"
-            placeholder="AA-123-BB"
-            className="h-24 sm:h-28 md:h-32 text-4xl sm:text-5xl md:text-6xl text-center font-mono tracking-widest placeholder:text-gray-400
-                       border-0 rounded-full shadow-2xl bg-white/95 backdrop-blur-md
-                       focus:ring-4 focus:ring-blue-500/20 pl-20 pr-28"
-            autoFocus
-            required
-            pattern="[A-Z]{2}-[0-9]{3}-[A-Z]{2}"
-          />
-          <Button className="absolute right-3 top-1/2 -translate-y-1/2 h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 rounded-full bg-blue-900 hover:bg-blue-800 shadow-2xl">
-            <Search className="h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14" />
-          </Button>
-        </div>
-      </form>
+      <form
+  onSubmit={(e) => {
+    e.preventDefault();
+    const input = e.currentTarget.elements.namedItem("plaque") as HTMLInputElement;
+    const value = input.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(value)) {
+      const formatted = value.replace(/([A-Z]{2})(\d{3})([A-Z]{2})/, "$1-$2-$3");
+      window.location.href = `/p/${formatted}`;
+    }
+  }}
+  className="w-full max-w-4xl"
+>
+  <div className="relative">
+    <Input
+      name="plaque"
+      placeholder="AA-123-BB"
+      className="h-32 md:h-36 text-5xl md:text-6xl text-center font-mono tracking-widest placeholder:text-gray-400
+                 border-0 rounded-full shadow-2xl bg-white/95 backdrop-blur-md
+                 focus:ring-4 focus:ring-blue-500/20 focus:outline-none pl-28 pr-80"
+      required
+      autoFocus
+    />
+    <Button
+      type="submit"
+      className="absolute right-5 top-1/2 -translate-y-1/2 h-24 w-24 rounded-full bg-blue-900 hover:bg-blue-800 shadow-2xl"
+    >
+      <Search className="h-12 w-12" />
+    </Button>
+  </div>
+</form>
 
       {/* 3 étapes – vertical sur mobile, horizontal sur grand écran */}
       <div className="space-y-8 sm:space-y-0 sm:flex sm:items-center sm:justify-center sm:gap-8 md:gap-16 text-gray-600">
