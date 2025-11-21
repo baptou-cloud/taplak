@@ -1,7 +1,8 @@
 // src/app/layout.tsx
 import "./globals.css";
 import Header from "@/components/Header";
-import UserFooter from "@/components/UserFooter";  // ← Nouveau composant
+import UserMenu from "@/components/UserMenu";        // ← Menu haut droite
+import LegalFooter from "@/components/LegalFooter";  // ← Footer légal
 
 export const metadata = {
   title: "Taplak – La réputation routière en France",
@@ -17,9 +18,11 @@ export default function RootLayout({
     <html lang="fr">
       <body className="bg-slate-50 min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 pt-20 pb-24">{children}</main>
-        {/* Footer fixe avec le menu utilisateur */}
-        <UserFooter />
+        <main className="flex-1 pt-20 pb-24 relative">
+          {children}
+          <UserMenu />          {/* ← Menu utilisateur en haut à droite */}
+        </main>
+        <LegalFooter />         {/* ← Footer légal fixe en bas */}
       </body>
     </html>
   );
