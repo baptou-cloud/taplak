@@ -1,9 +1,11 @@
-// src/app/p/[plaque]/page.tsx – FIX FINAL COOKIES NEXT 16
+// src/app/p/[plaque]/page.tsx – VERSION QUI MARCHE ENFIN EN PROD 2025
 import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn } from "lucide-react";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase-server";  // ← NOTRE CLIENT FIXÉ
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
+// FORCE SSR À CHAQUE REQUÊTE → évite le crash Turbopack + cookies
+export const dynamic = "force-dynamic";
 
 export default async function PlaquePage({
   params,
@@ -13,25 +15,8 @@ export default async function PlaquePage({
   const { plaque } = await params;
   const plaqueClean = plaque.toUpperCase().replace(/\s+/g, "-");
 
-  // Client Supabase server-side (fix types cookies pour Next 16)
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        },
-        set(name: string, value: string, options?: any) {
-          cookieStore.set(name, value, options);
-        },
-        remove(name: string, options?: any) {
-          cookieStore.set(name, '', options);
-        },
-      },
-    }
-  );
+  // Client Supabase partagé et awaité (fix Next 16)
+  const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -74,7 +59,7 @@ export default async function PlaquePage({
     return "Vigilance recommandée";
   };
 
-  // Server Action pour voter (même fix cookies)
+  // Server Action de vote
   async function voteAction(formData: FormData) {
     "use server";
     const direction = formData.get("direction") as "up" | "down";
@@ -85,24 +70,7 @@ export default async function PlaquePage({
         ? { votes_up: vehicle!.votes_up + 1, score: Math.min(100, vehicle!.score + 2) }
         : { votes_down: vehicle!.votes_down + 1, score: Math.max(30, vehicle!.score - 5) };
 
-    const cookieStoreVote = await cookies();
-    const supabaseVote = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStoreVote.get(name)?.value;
-          },
-          set(name: string, value: string, options?: any) {
-            cookieStoreVote.set(name, value, options);
-          },
-          remove(name: string, options?: any) {
-            cookieStoreVote.set(name, '', options);
-          },
-        },
-      }
-    );
+    const supabaseVote = await createClient();
 
     await supabaseVote
       .from("vehicles")
@@ -115,40 +83,27 @@ export default async function PlaquePage({
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
       <div className="max-w-4xl mx-auto p-6 pt-24">
-        <a
-          href="/"
-          className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-10 text-lg"
-        >
+        <a href="/" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-10 text-lg">
           <ArrowLeft className="w-5 h-5" /> Retour
         </a>
 
         <div className="flex justify-center mb-10">
-          <div
-            className={`inline-block px-12 py-7 rounded-2xl border-4 ${borderColor} bg-white shadow-2xl`}
-          >
-            <span className="text-6xl font-black tracking-wider text-slate-900">
-              {plaqueClean}
-            </span>
+          <div className={`inline-block px-12 py-7 rounded-2xl border-4 ${borderColor} bg-white shadow-2xl`}>
+            <span className="text-6xl font-black tracking-wider text-slate-900">{plaqueClean}</span>
           </div>
         </div>
 
         <div className="text-center mb-16">
           <p className="text-2xl text-slate-600 mb-4">Score Taplak</p>
-          <div className={`text-9xl font-black tabular-nums ${scoreColor} mb-6`}>
-            {vehicle.score}
-          </div>
-          <p className="text-2xl font-medium text-slate-800 max-w-2xl mx-auto">
-            {getVerdict()}
-          </p>
+          <div className={`text-9xl font-black tabular-nums ${scoreColor} mb-6`}>{vehicle.score}</div>
+          <p className="text-2xl font-medium text-slate-800 max-w-2xl mx-auto">{getVerdict()}</p>
         </div>
 
         {vehicle.score === 100 && (
           <div className="bg-white rounded-3xl shadow-xl p-12 mb-12 text-center">
             <CheckCircle2 className="w-24 h-24 mx-auto mb-6 text-green-600" />
             <p className="text-3xl font-bold text-green-700">Aucun signalement</p>
-            <p className="text-xl text-slate-600 mt-4">
-              Conducteur exemplaire reconnu par la communauté
-            </p>
+            <p className="text-xl text-slate-600 mt-4">Conducteur exemplaire reconnu par la communauté</p>
           </div>
         )}
 
@@ -165,9 +120,7 @@ export default async function PlaquePage({
                   <button type="submit" className="group flex items-center gap-4 px-10 py-6 bg-green-50 hover:bg-green-100 rounded-3xl border-4 border-green-300 transition transform hover:scale-110">
                     <ThumbsUp className="w-16 h-16 text-green-600 group-hover:scale-125 transition" />
                     <div className="text-left">
-                      <div className="text-4xl font-black text-green-600">
-                        {vehicle.votes_up}
-                      </div>
+                      <div className="text-4xl font-black text-green-600">{vehicle.votes_up}</div>
                       <div className="text-green-700 font-medium">Oui</div>
                     </div>
                   </button>
@@ -178,19 +131,14 @@ export default async function PlaquePage({
                   <button type="submit" className="group flex items-center gap-4 px-10 py-6 bg-red-50 hover:bg-red-100 rounded-3xl border-4 border-red-300 transition transform hover:scale-110">
                     <ThumbsDown className="w-16 h-16 text-red-600 group-hover:scale-125 transition" />
                     <div className="text-left">
-                      <div className="text-4xl font-black text-red-600">
-                        {vehicle.votes_down}
-                      </div>
+                      <div className="text-4xl font-black text-red-600">{vehicle.votes_down}</div>
                       <div className="text-red-700 font-medium">Non</div>
                     </div>
                   </button>
                 </form>
               </>
             ) : (
-              <a
-                href="/login"
-                className="flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition"
-              >
+              <a href="/login" className="flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition">
                 <LogIn className="w-6 h-6" />
                 Se connecter pour voter
               </a>
