@@ -1,4 +1,4 @@
-// src/app/p/[plaque]/page.tsx – version finale, badge vert tout en bas
+// src/app/p/[plaque]/page.tsx – version définitive, badge vert au bon endroit + mention légale toujours bien espacée
 "use client";
 
 import { useState, useEffect } from "react";
@@ -64,9 +64,8 @@ export default function PlaquePage() {
                   vehicle.score >= 70 ? "Quelques points d’attention" : "Vigilance recommandée";
 
   return (
-    <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20 relative">
+    <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20">
 
-      {/* Retour */}
       <a href="/" className="absolute top-20 left-6 flex items-center gap-2 text-gray-600 hover:text-black text-lg">
         <ArrowLeft className="w-5 h-5" /> Retour
       </a>
@@ -94,15 +93,25 @@ export default function PlaquePage() {
       </div>
 
       {/* Avis communauté */}
-      <div className="text-center mb-16">
+      <div className="text-center mb-8">
         <p className="text-gray-600 text-lg">Avis de la communauté</p>
         <p className="text-2xl md:text-3xl font-semibold text-gray-900 mt-2">
           {verdict}
         </p>
       </div>
 
+      {/* Badge "Aucun signalement" – exactement comme tu l’aimais */}
+      {vehicle.score === 100 && (
+        <div className="mb-20">
+          <div className="bg-green-50 border border-green-300 rounded-xl px-8 py-5 flex items-center gap-4">
+            <CheckCircle2 className="w-10 h-10 text-green-600" />
+            <p className="text-lg font-medium text-green-800">Aucun signalement enregistré</p>
+          </div>
+        </div>
+      )}
+
       {/* Votes */}
-      <div className="w-full max-w-sm mb-20">
+      <div className="w-full max-w-sm mb-32">
         {user ? (
           <div className="grid grid-cols-2 gap-6">
             <button onClick={() => handleVote("up")} className="p-6 bg-green-50 hover:bg-green-100 rounded-xl border border-green-200 transition">
@@ -125,18 +134,8 @@ export default function PlaquePage() {
         )}
       </div>
 
-      {/* Badge "Aucun signalement" – tout en bas, uniquement si score = 100 */}
-      {vehicle.score === 100 && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2">
-          <div className="bg-green-50 border border-green-300 rounded-xl px-8 py-5 flex items-center gap-4">
-            <CheckCircle2 className="w-10 h-10 text-green-600" />
-            <p className="text-lg font-medium text-green-800">Aucun signalement enregistré</p>
-          </div>
-        </div>
-      )}
-
-      {/* Mention légale – toujours en bas */}
-      <p className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center text-gray-500 text-xs flex items-center gap-1 max-w-md">
+      {/* Mention légale – toujours bien en bas, jamais collée */}
+      <p className="absolute bottom-10 left-1/2 -translate-x-1/2 text-center text-gray-500 text-xs flex items-center gap-1 max-w-md">
         <Shield className="w-4 h-4" />
         Signalements vérifiés manuellement · Aucune donnée personnelle diffusée
       </p>
