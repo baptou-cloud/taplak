@@ -12,10 +12,9 @@ export default async function PlaquePage({
   const { plaque } = await params;
   const plaqueClean = plaque.toUpperCase().replace(/\s+/g, "-");
 
-  // Client serveur avec cookies async (Next.js 15)
-  const cookieStore = await cookies();
+   // Client serveur compatible Next.js 15+ (cookies async)
   const supabaseServer = createServerComponentClient({
-    cookies: () => cookieStore,
+    cookies: () => cookies(),
   });
 
   const { data: { user } } = await supabaseServer.auth.getUser();
