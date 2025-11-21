@@ -26,7 +26,7 @@ export default function ClientHeader() {
     window.location.href = "/";
   };
 
-  const getScoreColor = (s => {
+    const getScoreColor = (s: number) => {
     if (s >= 90) return "bg-green-500";
     if (s >= 70) return "bg-amber-500";
     return "bg-red-500";
