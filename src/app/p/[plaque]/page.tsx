@@ -1,4 +1,4 @@
-// src/app/p/[plaque]/page.tsx – version finale, propre, réaliste, premium
+// src/app/p/[plaque]/page.tsx – version finale, ultra classe, sans erreur
 "use client";
 
 import { useState, useEffect } from "react";
@@ -70,7 +70,7 @@ export default function PlaquePage() {
 
       {/* Plaque encadrée – style vrai plaque française */}
       <div className="mb-16">
-        <div className="bg-white border-4 border-black rounded-lg shadow-2xl overflow-hidden">
+        <div className="bg-white border-4 border-black rounded-lg shadow-2xl overflow-hidden inline-block">
           <div className="bg-blue-700 px-6 py-2 flex items-center justify-center">
             <span className="text-white font-bold text-sm tracking-wider">F</span>
           </div>
@@ -85,7 +85,7 @@ export default function PlaquePage() {
         </div>
       </div>
 
-      {/* Score – rectangle arrondi, discret mais impactant */}
+      {/* Score – rectangle arrondi */}
       <div className="mb-12">
         <div className={`inline-flex items-center justify-center px-16 py-10 rounded-3xl ${scoreBg} shadow-xl`}>
           <span className="text-8xl md:text-9xl font-black text-white">{vehicle.score}</span>
@@ -93,7 +93,7 @@ export default function PlaquePage() {
       </div>
 
       {/* Verdict */}
-      <p className="text-2xl md:text-3xl font-medium text-gray-800 mb-16 text-center">
+      <p className="text-2xl md:text-3xl font-medium text-gray-800 mb-16 text-center max-w-2xl">
         {vehicle.score === 100 ? "Conducteur exemplaire" :
          vehicle.score >= 90 ? "Excellente conduite" :
          vehicle.score >= 70 ? "Quelques points d’attention" : "Vigilance recommandée"}
@@ -110,14 +110,42 @@ export default function PlaquePage() {
         </div>
       )}
 
-      {/* Votes – épurés */}
+      {/* Votes */}
       <div className="w-full max-w-md">
         {user ? (
           <div className="grid grid-cols-2 gap-8">
-            <button onClick={() => handleVote("up")} className="p-8 bg-green-50 hover:bg-green-100 rounded-2xl border-2 border-green-200 transition">
+            <button
+              onClick={() => handleVote("up")}
+              className="p-8 bg-green-50 hover:bg-green-100 rounded-2xl border-2 border-green-200 transition"
+            >
               <ThumbsUp className="w-16 h-16 mx-auto mb-3 text-green-600" />
               <span className="block text-4xl font-black text-green-600">{vehicle.votes_up}</span>
               <span className="text-green-700">Bon conducteur</span>
             </button>
-            <button onClick={() => handleVote("down")} className="p-8 bg-red-50 hover:bg-red-100 rounded-2xl border-2 border-red-200 transition">
-              <ThumbsDown className="w-16 h-16 mx-auto mb-3 text-red-600"
+
+            <button
+              onClick={() => handleVote("down")}
+              className="p-8 bg-red-50 hover:bg-red-100 rounded-2xl border-2 border-red-200 transition"
+            >
+              <ThumbsDown className="w-16 h-16 mx-auto mb-3 text-red-600" />
+              <span className="block text-4xl font-black text-red-600">{vehicle.votes_down}</span>
+              <span className="text-red-700">À surveiller</span>
+            </button>
+          </div>
+        ) : (
+          <div className="text-center">
+            <a href="/login" className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white rounded-full text-xl font-medium hover:bg-gray-800 transition">
+              <LogIn className="w-6 h-6" /> Se connecter pour voter
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* Légale */}
+      <p className="absolute bottom-8 text-center text-gray-500 text-sm flex items-center gap-2">
+        <Shield className="w-4 h-4" />
+        Signalements vérifiés manuellement · Aucune donnée personnelle diffusée
+      </p>
+    </main>
+  );
+}
