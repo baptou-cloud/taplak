@@ -1,5 +1,7 @@
+// src/app/layout.tsx
 import "./globals.css";
-import UserMenu from "@/components/UserMenu";
+import Header from "@/components/Header";
+import UserFooter from "@/components/UserFooter";  // ← Nouveau composant
 
 export const metadata = {
   title: "Taplak – La réputation routière en France",
@@ -13,12 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className="bg-slate-50 min-h-screen">
-        {/* On vire complètement le Header qui cachait le menu */}
-        <main className="pt-6 relative">
-          {children}
-          <UserMenu />
-        </main>
+      <body className="bg-slate-50 min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 pt-20 pb-24">{children}</main>
+        {/* Footer fixe avec le menu utilisateur */}
+        <UserFooter />
       </body>
     </html>
   );
