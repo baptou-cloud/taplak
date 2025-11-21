@@ -1,56 +1,66 @@
-// src/app/p/[plaque]/page.tsx – VERSION QUI MARCHE ENFIN EN PROD 2025
+"use client";  // ← CLIENT-SIDE ONLY, ADIEU SSR CRASHES
+
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ThumbsUp, ThumbsDown, CheckCircle2, LogIn } from "lucide-react";
-import { createClient } from "@/lib/supabase-server";  // ← NOTRE CLIENT FIXÉ
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
+import { createBrowserClient } from '@supabase/ssr';
+import { supabase } from "@/lib/supabaseClient";  // Ton client browser
 
-// FORCE SSR À CHAQUE REQUÊTE → évite le crash Turbopack + cookies
-export const dynamic = "force-dynamic";
-
-export default async function PlaquePage({
-  params,
-}: {
-  params: Promise<{ plaque: string }>;
-}) {
-  const { plaque } = await params;
+export default function PlaquePage() {
+  const router = useRouter();
+  const params = useParams();
+  const plaque = params.plaque as string;
   const plaqueClean = plaque.toUpperCase().replace(/\s+/g, "-");
 
-  // Client Supabase partagé et awaité (fix Next 16)
-  const supabase = await createClient();
+  const [vehicle, setVehicle] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const { data: { user } } = await supabase.auth.getUser();
+  useEffect(() => {
+    const fetchVehicle = async () => {
+      setLoading(true);
+      setError(null);
 
-  // Recherche ou création du véhicule
-  let { data: vehicle } = await supabase
-    .from("vehicles")
-    .select("*")
-    .eq("plaque", plaqueClean)
-    .single();
+      try {
+        // Get user
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
 
-  if (!vehicle) {
-    const { data } = await supabase
-      .from("vehicles")
-      .insert({ plaque: plaqueClean, score: 100, votes_up: 0, votes_down: 0 })
-      .select()
-      .single();
-    vehicle = data;
-  }
+        // Fetch or create vehicle
+        let { data: vehicleData } = await supabase
+          .from("vehicles")
+          .select("*")
+          .eq("plaque", plaqueClean)
+          .single();
 
-  if (!vehicle) redirect("/");
+        if (!vehicleData) {
+          const { data } = await supabase
+            .from("vehicles")
+            .insert({ plaque: plaqueClean, score: 100, votes_up: 0, votes_down: 0 })
+            .select()
+            .single();
+          vehicleData = data;
+        }
 
-  const scoreColor =
-    vehicle.score >= 80
-      ? "text-green-600"
-      : vehicle.score >= 60
-      ? "text-yellow-600"
-      : "text-red-600";
+        setVehicle(vehicleData);
+      } catch (err) {
+        setError("Erreur lors du chargement de la plaque");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const borderColor =
-    vehicle.score >= 80
-      ? "border-green-600"
-      : vehicle.score >= 60
-      ? "border-yellow-600"
-      : "border-red-600";
+    fetchVehicle();
+  }, [plaqueClean]);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-600">{error}</div>;
+  if (!vehicle) return <div className="min-h-screen flex items-center justify-center">Plaque non trouvée</div>;
+
+  const scoreColor = vehicle.score >= 80 ? "text-green-600" : vehicle.score >= 60 ? "text-yellow-600" : "text-red-600";
+  const borderColor = vehicle.score >= 80 ? "border-green-600" : vehicle.score >= 60 ? "border-yellow-600" : "border-red-600";
 
   const getVerdict = () => {
     if (vehicle.score === 100) return "Conducteur exemplaire – aucun signalement";
@@ -59,26 +69,26 @@ export default async function PlaquePage({
     return "Vigilance recommandée";
   };
 
-  // Server Action de vote
-  async function voteAction(formData: FormData) {
-    "use server";
-    const direction = formData.get("direction") as "up" | "down";
-    if (!user || !direction) return;
+  const handleVote = async (direction: "up" | "down") => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
 
-    const increment =
-      direction === "up"
-        ? { votes_up: vehicle!.votes_up + 1, score: Math.min(100, vehicle!.score + 2) }
-        : { votes_down: vehicle!.votes_down + 1, score: Math.max(30, vehicle!.score - 5) };
+    const increment = direction === "up"
+      ? { votes_up: vehicle.votes_up + 1, score: Math.min(100, vehicle.score + 2) }
+      : { votes_down: vehicle.votes_down + 1, score: Math.max(30, vehicle.score - 5) };
 
-    const supabaseVote = await createClient();
-
-    await supabaseVote
+    const { error } = await supabase
       .from("vehicles")
       .update(increment)
-      .eq("id", vehicle!.id);
+      .eq("id", vehicle.id);
 
-    revalidatePath(`/p/${plaqueClean}`);
-  }
+    if (!error) {
+      // Refresh the page to update UI
+      router.refresh();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
@@ -115,27 +125,21 @@ export default async function PlaquePage({
           <div className="flex justify-center gap-16">
             {user ? (
               <>
-                <form action={voteAction}>
-                  <input type="hidden" name="direction" value="up" />
-                  <button type="submit" className="group flex items-center gap-4 px-10 py-6 bg-green-50 hover:bg-green-100 rounded-3xl border-4 border-green-300 transition transform hover:scale-110">
-                    <ThumbsUp className="w-16 h-16 text-green-600 group-hover:scale-125 transition" />
-                    <div className="text-left">
-                      <div className="text-4xl font-black text-green-600">{vehicle.votes_up}</div>
-                      <div className="text-green-700 font-medium">Oui</div>
-                    </div>
-                  </button>
-                </form>
+                <button onClick={() => handleVote("up")} className="group flex items-center gap-4 px-10 py-6 bg-green-50 hover:bg-green-100 rounded-3xl border-4 border-green-300 transition transform hover:scale-110">
+                  <ThumbsUp className="w-16 h-16 text-green-600 group-hover:scale-125 transition" />
+                  <div className="text-left">
+                    <div className="text-4xl font-black text-green-600">{vehicle.votes_up}</div>
+                    <div className="text-green-700 font-medium">Oui</div>
+                  </div>
+                </button>
 
-                <form action={voteAction}>
-                  <input type="hidden" name="direction" value="down" />
-                  <button type="submit" className="group flex items-center gap-4 px-10 py-6 bg-red-50 hover:bg-red-100 rounded-3xl border-4 border-red-300 transition transform hover:scale-110">
-                    <ThumbsDown className="w-16 h-16 text-red-600 group-hover:scale-125 transition" />
-                    <div className="text-left">
-                      <div className="text-4xl font-black text-red-600">{vehicle.votes_down}</div>
-                      <div className="text-red-700 font-medium">Non</div>
-                    </div>
-                  </button>
-                </form>
+                <button onClick={() => handleVote("down")} className="group flex items-center gap-4 px-10 py-6 bg-red-50 hover:bg-red-100 rounded-3xl border-4 border-red-300 transition transform hover:scale-110">
+                  <ThumbsDown className="w-16 h-16 text-red-600 group-hover:scale-125 transition" />
+                  <div className="text-left">
+                    <div className="text-4xl font-black text-red-600">{vehicle.votes_down}</div>
+                    <div className="text-red-700 font-medium">Non</div>
+                  </div>
+                </button>
               </>
             ) : (
               <a href="/login" className="flex items-center gap-3 px-8 py-4 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition">
