@@ -1,7 +1,7 @@
 // src/app/p/[plaque]/page.tsx – version finale SANS la phrase du bas
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, CheckCircle2, ThumbsUp, ThumbsDown, LogIn } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
