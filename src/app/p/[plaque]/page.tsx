@@ -9,7 +9,7 @@ import { supabase } from "@/lib/supabaseClient";
 export default function PlaquePage() {
   const router = useRouter();
   const { plaque: rawPlaque } = useParams();
-  const plaque = (rawPlaque as string).toUpperCase();
+  const plaque = (rawPlaque as string).toUpperCase(); 
 
   const [vehicle, setVehicle] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
