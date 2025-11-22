@@ -4,9 +4,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Upload, Shield, CheckCircle2, Camera, Video } from "lucide-react";
-import { createClient } from "@/lib/supabaseClient";
-
-const supabase = createClient();
+import { supabase } from "@/lib/supabaseClient";
 
 const MOTIFS = [
   "Excès de vitesse", "Conduite dangereuse", "Dépassement dangereux", "Queue de poisson",
