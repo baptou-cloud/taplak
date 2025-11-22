@@ -1,3 +1,4 @@
+// src/components/ClientHeader.tsx (ou où tu l’as placé)
 "use client";
 
 import Link from "next/link";
@@ -13,13 +14,25 @@ export default function ClientHeader() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data: listener } = supabase.auth.onAuthStateChange((_, s) => setUser(s?.user ?? null));
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null);
+    });
+
     return () => listener.subscription.unsubscribe();
   }, []);
 
   const logout = async () => {
     await supabase.auth.signOut();
     window.location.href = "/";
+  };
+
+  // Fonction pour aller sur /report avec la plaque pré-remplie si on est sur une page /p/...
+  const goToReport = () => {
+    const match = window.location.pathname.match(/\/p\/([A-Z0-9-]+)/);
+    const plaque = match ? match[1] : "";
+    window.location.href = plaque ? `/report?plaque=${plaque}` : "/report";
+    setOpen(false);
   };
 
   return (
@@ -29,9 +42,9 @@ export default function ClientHeader() {
         {/* Logo + Titre */}
         <Link href="/" className="flex items-center gap-3">
           <Image src="/car-logo.svg" alt="Taplak" width={36} height={36} />
-          <span 
+          <span
             className="text-2xl font-black tracking-tight text-gray-900"
-            style={{ 
+            style={{
               fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif",
               letterSpacing: "-0.02em"
             }}
@@ -40,7 +53,7 @@ export default function ClientHeader() {
           </span>
         </Link>
 
-        {/* Hamburger – bien visible, style Apple */}
+        {/* Hamburger */}
         <div className="relative">
           <Button
             variant="ghost"
@@ -51,35 +64,44 @@ export default function ClientHeader() {
             <Menu className="h-7 w-7 text-gray-800" />
           </Button>
 
-          {/* Menu déroulant – ultra propre */}
+          {/* Menu déroulant */}
           {open && (
             <div className="absolute right-0 top-16 w-80 rounded-2xl border border-gray-200 bg-white shadow-2xl py-4">
               {user ? (
                 <>
-                  <Link href="/profil" className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+                  <Link href="/profil" className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50" onClick={() => setOpen(false)}>
                     <User className="h-6 w-6" />
                     <span className="font-medium">Mon profil</span>
                   </Link>
-                  <Link href="/classement" className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+
+                  <Link href="/classement" className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50" onClick={() => setOpen(false)}>
                     <Trophy className="h-6 w-6" />
                     <span className="font-medium">Classement</span>
                   </Link>
-                  <Link href="/conduite" className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50">
+
+                  <Link href="/conduite" className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50" onClick={() => setOpen(false)}>
                     <Lightbulb className="h-6 w-6" />
                     <span className="font-medium">Optimiser ma conduite</span>
                   </Link>
+
                   <div className="h-px bg-gray-200 my-2" />
-                  <Link href="/p/nouveau" className="flex items-center gap-4 px-6 py-4 text-red-600 font-medium hover:bg-red-50">
+
+                  {/* Bouton Signalement – pré-remplit la plaque si possible */}
+                  <button
+                    onClick={goToReport}
+                    className="flex w-full items-center gap-4 px-6 py-4 text-red-600 font-medium hover:bg-red-50 text-left"
+                  >
                     <Siren className="h-6 w-6" />
                     Faire un signalement
-                  </Link>
-                  <button onClick={logout} className="flex items-center gap-4 px-6 py-4 w-full text-left hover:bg-gray-50">
+                  </button>
+
+                  <button onClick={logout} className="flex w-full items-center gap-4 px-6 py-4 hover:bg-gray-50 text-left">
                     <LogOut className="h-6 w-6" />
                     <span>Déconnexion</span>
                   </button>
                 </>
               ) : (
-                <Link href="/login" className="block px-6 py-4 text-center font-medium hover:bg-gray-50">
+                <Link href="/login" className="block px-6 py-4 text-center font-medium hover:bg-gray-50" onClick={() => setOpen(false)}>
                   Connexion
                 </Link>
               )}
